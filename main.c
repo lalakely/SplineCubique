@@ -127,25 +127,25 @@ void getDataF(float ** x , float ** y , int dim){
 float * Cholesky(){
 	FILE * pf = fopen("matrice.txt" , "r");
 	
-
 	float ** A = NULL;
-        float * B = NULL;
-        float * X = NULL;
-		int dim = 0;
+	float * B = NULL;
+	float * X = NULL;
+	int dim = 0;
 
-        fscanf(pf , "%d" , &dim);
-        A = allocFloat2D(A , dim);
-        for(int i = 0 ; i < dim ; i++){
-                for(int j = 0 ; j < dim ; j++){
-                        fscanf(pf , "%f" , &A[i][j]);
-                }
-        }
-
-        B = allocFloat1D(B , dim);
-        for(int i=0; i<dim; i++) {
-                fscanf(pf, "%f", &B[i]);
+	fscanf(pf , "%d" , &dim);
+	A = allocFloat2D(A , dim);
+	for(int i = 0 ; i < dim ; i++){
+			for(int j = 0 ; j < dim ; j++){
+					fscanf(pf , "%f" , &A[i][j]);
+			}
 	}
 
+	B = allocFloat1D(B , dim);
+	for(int i=0; i<dim; i++) {
+			fscanf(pf, "%f", &B[i]);
+	}
+
+	X = allocFloat1D(X , dim);
 
 	/// Factoriser A sachant qu'on travaille sur place
 	float *y = malloc(dim * sizeof(float));
@@ -184,13 +184,13 @@ float * Cholesky(){
 	
 	/// Resolution Bt x = y
 	// En utilisant A
-	for(int i = dim -1 ; i >= 0 ; i--){
+	for(int i = dim - 1 ; i >= 0 ; i--){
 		float s = 0;
 		for(int j = i + 1 ; j < dim ; j++){
 			s+= A[j][i] * X[j];
 		}
-		//X[i] = (y[i] - s ) / A[i][i];
-		printf("%f\n" , B[i]);
+		X[i] = (y[i] - s ) / A[i][i];
+		printf("%f\n" , X[i]);
 	}
 	return X;
 }
