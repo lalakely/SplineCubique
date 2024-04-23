@@ -19,7 +19,7 @@ void gplotf();
 int main(){
 	float * x = NULL;
 	float * y = NULL;
-	int dim = 7;
+	int dim = 10;
 	float * B = NULL;
 	float ** A = NULL;
 
@@ -44,10 +44,10 @@ void gplotf(){
 		fprintf(gnuplotPipe,"set ylabel 'y'\n");
 		fprintf(gnuplotPipe,"set yzeroaxis\n");
 		fprintf(gnuplotPipe,"set xzeroaxis\n");
-		fprintf(gnuplotPipe,"set xrange [%f:%f]\n",-6.,8.);
+		fprintf(gnuplotPipe,"set xrange [%f:%f]\n",-5.,10.);
 		fprintf(gnuplotPipe, "set loadpath 'E:'\n");
-		fprintf(gnuplotPipe,"set yrange [%f:%f]\n",-2.,5.);
-		fprintf(gnuplotPipe,"plot 'points.txt' using 1:2 with linespoints pt 7 ps 0.1 lc 'red' lw 3, 'data.txt' using 1:2 with linespoints pt 7 ps 2 lc 'blue' lw 3\n");
+		fprintf(gnuplotPipe,"set yrange [%f:%f]\n",-10.,10.);
+		fprintf(gnuplotPipe,"plot 'points.txt' using 1:2 with linespoints pt 7 ps 0.1 lc 'red' lw 3, 'data0.bbt' using 1:2 with linespoints pt 7 ps 2 lc 'blue' lw 3\n");
 		
 		fflush(gnuplotPipe);
 		pclose(gnuplotPipe);
@@ -57,7 +57,7 @@ void gplotf(){
 void writePoints(float *x, float *y, int dim) {
 	FILE * fp = fopen("points.txt" , "w");
 	float S = 0;
-	float step = 0.0001;
+	float step = 0.001;
 	float *S2 = allocFloat1D(S2, dim);
 	S2 = Cholesky();
 	if(fp){
@@ -160,7 +160,7 @@ void getDataF(float ** x , float ** y , int dim){
 	float * x_p = allocFloat1D(x_p  , dim);
 	float * y_p = allocFloat1D(y_p , dim);
 
-	FILE * fp = fopen("data.txt" , "r");
+	FILE * fp = fopen("data0.bbt" , "r");
 	if(fp){
 		for(int i = 0 ; i < dim ; i++){
 			fscanf(fp , "%f %f" , &x_p[i] , &y_p[i]);
