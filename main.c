@@ -47,7 +47,7 @@ void gplotf(){
 		fprintf(gnuplotPipe,"set xrange [%f:%f]\n",-6.,8.);
 		fprintf(gnuplotPipe, "set loadpath 'E:'\n");
 		fprintf(gnuplotPipe,"set yrange [%f:%f]\n",-2.,5.);
-		fprintf(gnuplotPipe,"plot 'points.txt' using 1:2 with linespoints pt 7 ps 1 lc 'red' lw 3, 'data.txt' using 1:2 with linespoints pt 7 ps 2 lc 'blue' lw 3\n");
+		fprintf(gnuplotPipe,"plot 'points.txt' using 1:2 with linespoints pt 7 ps 0.1 lc 'red' lw 3, 'data.txt' using 1:2 with linespoints pt 7 ps 2 lc 'blue' lw 3\n");
 		
 		fflush(gnuplotPipe);
 		pclose(gnuplotPipe);
@@ -57,18 +57,18 @@ void gplotf(){
 void writePoints(float *x, float *y, int dim) {
 	FILE * fp = fopen("points.txt" , "w");
 	float S = 0;
-	float step = 1;
+	float step = 0.0001;
 	float *S2 = allocFloat1D(S2, dim);
 	S2 = Cholesky();
 	if(fp){
 		for(int j = 0 ; j < dim-1 ; j++){
-			for(float i = 0 ; i < dim ; i+=step){
+			for(float i = x[j] ; i < x[j+1] ; i+=step){
 				float S2j = j==0 ? 0 : S2[j-1];
 				float dj = distance(x, j+1);
 				float xj1 = x[j+1] - i;
 				float xj = i - x[j];
 				S = (1 / (6 * dj)) * (S2j * pow(xj1, 3) + S2[j] * pow(xj, 3)) + (y[j] / dj - S2j * dj / 6) * xj1 + (y[j+1] / dj - S2[j] * dj / 6) * xj;
-				fprintf(fp , "%f %f\n", S, i);
+				fprintf(fp , "%f %f\n", i, S);
 			}
 		}
 	}else{
