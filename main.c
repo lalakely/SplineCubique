@@ -13,6 +13,8 @@ float psy(float  distance,float distance_1 ,int indice , float * y);
 float ** matrice(float * x , float * y,float ** B ,int dim);
 void writeOnFile(float ** A , float * B , int dim);
 float * Cholesky();
+void writePoints(float *x, float *y, int dim);
+void gplotf();
 
 int main(){
 	float * x = NULL;
@@ -25,8 +27,54 @@ int main(){
 	A = matrice(x , y , &B , dim);
 	display(x, y , dim);
 	writeOnFile(A , B , dim);
-	Cholesky();
+	writePoints(x, y , dim);
+	gplotf();
+
 	return 0;
+}
+
+void gplotf(){
+	FILE *gnuplotPipe = popen("gnuplot -persist","w");
+	
+	if(gnuplotPipe){
+/// Paramètrage de gnuplot
+		fprintf(gnuplotPipe,"set term qt size 800,600\n");
+		fprintf(gnuplotPipe,"set title 'TITRE'\n");
+		fprintf(gnuplotPipe,"set xlabel 'x'\n");
+		fprintf(gnuplotPipe,"set ylabel 'y'\n");
+		fprintf(gnuplotPipe,"set yzeroaxis\n");
+		fprintf(gnuplotPipe,"set xzeroaxis\n");
+		fprintf(gnuplotPipe,"set xrange [%f:%f]\n",-6.,8.);
+		fprintf(gnuplotPipe, "set loadpath 'E:'\n");
+		fprintf(gnuplotPipe,"set yrange [%f:%f]\n",-2.,5.);
+		fprintf(gnuplotPipe,"plot 'points.txt' using 1:2 with linespoints pt 7 ps 1 lc 'red' lw 3, 'data.txt' using 1:2 with linespoints pt 7 ps 2 lc 'blue' lw 3\n");
+		
+		fflush(gnuplotPipe);
+		pclose(gnuplotPipe);
+	}
+}
+
+void writePoints(float *x, float *y, int dim) {
+	FILE * fp = fopen("points.txt" , "w");
+	float S = 0;
+	float step = 1;
+	float *S2 = allocFloat1D(S2, dim);
+	S2 = Cholesky();
+	if(fp){
+		for(int j = 0 ; j < dim-1 ; j++){
+			for(float i = 0 ; i < dim ; i+=step){
+				float S2j = j==0 ? 0 : S2[j-1];
+				float dj = distance(x, j+1);
+				float xj1 = x[j+1] - i;
+				float xj = i - x[j];
+				S = (1 / (6 * dj)) * (S2j * pow(xj1, 3) + S2[j] * pow(xj, 3)) + (y[j] / dj - S2j * dj / 6) * xj1 + (y[j+1] / dj - S2[j] * dj / 6) * xj;
+				fprintf(fp , "%f %f\n", S, i);
+			}
+		}
+	}else{
+		printf("Impossible d'ouvrir ce fichier !! \n");
+	}
+	fclose(fp);
 }
 
 void writeOnFile(float ** A , float * B , int dim){
@@ -148,7 +196,7 @@ float * Cholesky(){
 	X = allocFloat1D(X , dim);
 
 	/// Factoriser A sachant qu'on travaille sur place
-	float *y = malloc(dim * sizeof(float));
+	float *y = malloc(dim* sizeof(float));
 	for(int i = 0 ; i < dim ; i++){
 		y[i] = 0;
 	}
@@ -190,7 +238,6 @@ float * Cholesky(){
 			s+= A[j][i] * X[j];
 		}
 		X[i] = (y[i] - s ) / A[i][i];
-		printf("%f\n" , X[i]);
 	}
 	return X;
 }
